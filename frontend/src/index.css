@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #0b0d12;
+  --color-raised: #12151d;
+  --color-input: #171b26;
+  --color-edge: #262b3a;
+  --color-netflix: #e50914;
+}
+
+body {
+  @apply bg-surface text-zinc-100 antialiased;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
