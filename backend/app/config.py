@@ -17,8 +17,8 @@ class Settings(BaseSettings):
     # Vector store selection: "pinecone" or "chroma"
     vector_db: Literal["pinecone", "chroma"] = "pinecone"
 
-    # Embeddings
-    openai_api_key: str
+    # Embeddings (required — queries and ingestion are embedded with OpenAI)
+    openai_api_key: str | None = None
     embedding_model: str = "text-embedding-3-small"
     embedding_dim: int = 1536
 
@@ -32,9 +32,6 @@ class Settings(BaseSettings):
     chroma_collection: str = "netflix_titles_1000"
 
     # LLM (RAG answer generation)
-    llm_provider: Literal["groq", "openai"] = "groq"
-    groq_api_key: str | None = None
-    llm_model: str = "llama-3.3-70b-versatile"
     openai_chat_model: str = "gpt-4o-mini"
 
     # Dataset

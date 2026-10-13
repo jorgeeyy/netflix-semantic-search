@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from . import dependencies
 from .config import get_settings
+from .services.query_utils import detect_top_k
 from .models.schemas import (
     AskRequest,
     AskResponse,
@@ -16,6 +17,13 @@ from .models.schemas import (
 )
 
 router = APIRouter(prefix="/api")
+
+
+def require_embedder():
+    try:
+        return dependencies.get_embedder()
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -36,7 +44,7 @@ def meta() -> MetaResponse:
         active=dependencies.get_active_backend_name(),
         embedding_model=settings.embedding_model,
         embedding_dim=settings.embedding_dim,
-        llm_provider=settings.llm_provider if settings.groq_api_key else "openai",
+        llm_provider="openai",
         csv_path=settings.csv_path,
     )
 
@@ -50,9 +58,10 @@ def switch_backend(body: BackendRequest) -> MetaResponse:
 @router.post("/search", response_model=SearchResponse)
 def search(body: SearchRequest) -> SearchResponse:
     store = dependencies.get_active_store()
-    embedder = dependencies.get_embedder()
+    embedder = require_embedder()
+    top_k = body.top_k if body.top_k is not None else detect_top_k(body.query)
     vector = embedder.embed_query(body.query)
-    matches = store.query(vector, body.top_k)
+    matches = store.query(vector, top_k)
 
     results = [
         SearchResult(
@@ -76,8 +85,10 @@ def search(body: SearchRequest) -> SearchResponse:
 
 @router.post("/ask", response_model=AskResponse)
 def ask(body: AskRequest) -> AskResponse:
+    require_embedder()
     rag = dependencies.get_rag_service()
-    result = rag.ask(body.question, body.top_k)
+    top_k = body.top_k if body.top_k is not None else detect_top_k(body.question)
+    result = rag.ask(body.question, top_k)
     return AskResponse(**result)
 
 
@@ -90,5 +101,6 @@ def ingest(body: IngestRequest) -> IngestResponse:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     ingest_service = dependencies.get_ingest_service()
+    require_embedder()
     result = ingest_service.ingest(store, wipe=body.wipe)
     return IngestResponse(**result)

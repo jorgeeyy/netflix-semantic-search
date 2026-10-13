@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react'
 import { getMeta, switchBackend } from './api/client'
-import AskPanel from './components/AskPanel'
 import IngestPanel from './components/IngestPanel'
 import SearchPanel from './components/SearchPanel'
 import type { Backend, MetaResponse } from './types'
 
-type Tab = 'search' | 'ask' | 'ingest'
+type Tab = 'search' | 'ingest'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'search', label: 'Search' },
-  { id: 'ask', label: 'Ask' },
   { id: 'ingest', label: 'Data' },
 ]
 
@@ -81,7 +79,6 @@ export default function App() {
 
       <main>
         {tab === 'search' && <SearchPanel />}
-        {tab === 'ask' && <AskPanel />}
         {tab === 'ingest' && <IngestPanel backend={backend} />}
       </main>
 

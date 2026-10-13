@@ -1,4 +1,12 @@
-.venv
+.venv/
 chroma_db/
 .env
 app.py
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/

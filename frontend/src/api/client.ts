@@ -34,17 +34,17 @@ export function switchBackend(backend: Backend): Promise<MetaResponse> {
   })
 }
 
-export function search(query: string, topK: number): Promise<SearchResponse> {
+export function search(query: string): Promise<SearchResponse> {
   return request<SearchResponse>('/api/search', {
     method: 'POST',
-    body: JSON.stringify({ query, top_k: topK }),
+    body: JSON.stringify({ query }),
   })
 }
 
-export function ask(question: string, topK: number): Promise<AskResponse> {
+export function ask(question: string): Promise<AskResponse> {
   return request<AskResponse>('/api/ask', {
     method: 'POST',
-    body: JSON.stringify({ question, top_k: topK }),
+    body: JSON.stringify({ question }),
   })
 }
 

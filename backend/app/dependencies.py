@@ -19,6 +19,11 @@ def set_active_backend(backend: str) -> None:
 @lru_cache
 def get_embedder() -> Embedder:
     settings = get_settings()
+    if not settings.openai_api_key:
+        raise RuntimeError(
+            "OPENAI_API_KEY is not set. It is required for embeddings "
+            "(text-embedding-3-small). GROQ_API_KEY only powers the /ask LLM."
+        )
     return Embedder(
         api_key=settings.openai_api_key,
         model=settings.embedding_model,
@@ -59,9 +64,6 @@ def get_rag_service() -> RAGService:
     return RAGService(
         embedder=get_embedder(),
         store_provider=get_active_store,
-        provider=settings.llm_provider,
-        groq_api_key=settings.groq_api_key,
-        groq_model=settings.llm_model,
         openai_api_key=settings.openai_api_key,
         openai_model=settings.openai_chat_model,
     )

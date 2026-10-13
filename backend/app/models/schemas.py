@@ -5,7 +5,12 @@ from pydantic import BaseModel, Field
 
 class SearchRequest(BaseModel):
     query: str = Field(min_length=1, max_length=500, examples=["movie about a deadly home invasion"])
-    top_k: int = Field(default=5, ge=1, le=25)
+    top_k: int | None = Field(
+        default=None,
+        ge=1,
+        le=25,
+        description="Defaults to 1, or is detected from the query (e.g. 'top three')",
+    )
 
 
 class SearchResult(BaseModel):
@@ -31,7 +36,12 @@ class SearchResponse(BaseModel):
 
 class AskRequest(BaseModel):
     question: str = Field(min_length=1, max_length=1000, examples=["Which movies are about home invasions?"])
-    top_k: int = Field(default=5, ge=1, le=15)
+    top_k: int | None = Field(
+        default=None,
+        ge=1,
+        le=15,
+        description="Defaults to 1, or is detected from the question (e.g. 'top three')",
+    )
 
 
 class Source(BaseModel):
